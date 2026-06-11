@@ -7,10 +7,12 @@ Calculation and verification of industrial stairs per **ISO 14122-3** (Safety of
 
 - Calculate stair parameters from: total rise height (H), number of steps (N), or inclination angle
 - Automatic ISO 14122-3 compliance checks:
-  - Inclination angle: 30°–38°
+  - Stairs inclination angle: 20°–45°
+  - Stepladders inclination angle: 45°–75°
   - Blondel formula: 600–660 mm
-  - Minimum tread depth: 200 mm
-  - Minimum stair width: 600 mm
+  - Minimum tread depth: 200 mm (stairs) / 150 mm (stepladders)
+  - Maximum riser height: 240 mm (stairs) / 250 mm (stepladders)
+  - Minimum stair width: 600 mm (stairs) / 500 mm (stepladders)
 - Side-view SVG visualization
 - Non-compliant parameters highlighted in red
 
