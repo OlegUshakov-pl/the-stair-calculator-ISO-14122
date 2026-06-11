@@ -12,6 +12,28 @@ col_sidebar, col_main = st.columns([1, 2])
 with col_sidebar:
     st.header("Input Parameters")
 
+
+    stair_type = st.selectbox(
+        "Stair type per ISO 14122-3", ["Stairs (20°–45°)", "Stepladders (45°–75°)"]
+    )
+
+    if stair_type == "Stairs (20°–45°)":
+        angle_min_ok, angle_max_ok = 20, 45
+        angled_slider_min, angled_slider_max = 20, 45
+        g_min_ok = 200
+        h_max_ok = 240
+        w_min_ok = 600
+        blondel_applies = True
+    else:
+        angle_min_ok, angle_max_ok = 45, 75
+        angled_slider_min, angled_slider_max = 45, 75
+        g_min_ok = 150
+        h_max_ok = 250
+        w_min_ok = 500
+        blondel_applies = False
+
+=======
+>>>>>>> e23cec8527d2b1d8f825a0ca2536934f081688a2
     input_mode = st.selectbox(
         "Input mode", ["Total rise height (H)", "Steps (N)", "Angle"]
     )
@@ -32,9 +54,11 @@ with col_sidebar:
     elif input_mode == "Angle":
         angle_desired = st.slider(
             "Desired angle (°)",
-            20,
-            75,
-            33,
+<<<<<<< HEAD
+            angled_slider_min,
+            angled_slider_max,
+            (angled_slider_min + angled_slider_max) // 2,
+
         )
         angle_rad = math.radians(angle_desired)
         h_actual = 630 * math.tan(angle_rad) / (1 + 2 * math.tan(angle_rad))
@@ -44,7 +68,9 @@ with col_sidebar:
         h_actual = H / N
     else:
         h_target = st.slider(
-            "Desired riser height (h), mm", 140, 250, 180
+<<<<<<< HEAD
+            "Desired riser height (h), mm", 140, h_max_ok, min(180, h_max_ok)
+
         )
         N = round(H / h_target)
         if N == 0:
@@ -228,4 +254,4 @@ with col_main:
         )
 
 st.markdown("---")
-st.caption("Version: 1.0")
+st.caption("Version: 1.2")
