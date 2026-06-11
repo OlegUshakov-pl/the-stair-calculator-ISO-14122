@@ -11,6 +11,26 @@ col_sidebar, col_main = st.columns([1, 2])
 with col_sidebar:
     st.header("Input Parameters")
 
+    stair_type = st.selectbox(
+        "Stair type per ISO 14122-3",
+        ["Stairs (20°–45°)", "Stepladders (45°–75°)"]
+    )
+
+    if stair_type == "Stairs (20°–45°)":
+        angle_min_ok, angle_max_ok = 20, 45
+        angled_slider_min, angled_slider_max = 20, 45
+        g_min_ok = 200
+        h_max_ok = 240
+        w_min_ok = 600
+        blondel_applies = True
+    else:
+        angle_min_ok, angle_max_ok = 45, 75
+        angled_slider_min, angled_slider_max = 45, 75
+        g_min_ok = 150
+        h_max_ok = 250
+        w_min_ok = 500
+        blondel_applies = False
+
     input_mode = st.selectbox(
         "Input mode",
         ["Total rise height (H)", "Steps (N)", "Angle"]
@@ -22,7 +42,7 @@ with col_sidebar:
         N = st.number_input("Number of steps (N)", min_value=1, max_value=30, value=round(H / 180), step=1)
         h_actual = H / N
     elif input_mode == "Angle":
-        angle_desired = st.slider("Desired angle (°)", 30, 38, 33)
+        angle_desired = st.slider("Desired angle (°)", angled_slider_min, angled_slider_max, (angled_slider_min + angled_slider_max) // 2)
         angle_rad = math.radians(angle_desired)
         h_actual = 630 * math.tan(angle_rad) / (1 + 2 * math.tan(angle_rad))
         N = round(H / h_actual)
@@ -30,13 +50,13 @@ with col_sidebar:
             N = 1
         h_actual = H / N
     else:
-        h_target = st.slider("Desired riser height (h), mm", 140, 250, 180)
+        h_target = st.slider("Desired riser height (h), mm", 140, h_max_ok, min(180, h_max_ok))
         N = round(H / h_target)
         if N == 0:
             N = 1
         h_actual = H / N
 
-    W = st.slider("Stair width, mm", 600, 1200, 800)
+    W = st.slider("Stair width, mm", 400, 1200, w_min_ok)
 
     g_actual = 630 - (2 * h_actual)
 
@@ -48,27 +68,32 @@ with col_sidebar:
     L = g_actual * (N - 1)
 
     blondel = g_actual + 2 * h_actual
-    is_valid_blondel = 600 <= blondel <= 660
-    is_valid_angle = 30 <= angle <= 38
-    is_valid_h = h_actual <= 250
-    is_valid_g = g_actual >= 200
-    is_valid_w = W >= 600
+
+    is_valid_blondel = 600 <= blondel <= 660 if blondel_applies else True
+    is_valid_angle = angle_min_ok <= angle <= angle_max_ok
+    is_valid_h = h_actual <= h_max_ok
+    is_valid_g = g_actual >= g_min_ok
+    is_valid_w = W >= w_min_ok
 
     is_all_valid = all([is_valid_blondel, is_valid_angle, is_valid_h, is_valid_g, is_valid_w])
 
     st.markdown("---")
-    st.subheader("ISO 14122-3 Compliance")
+    st.subheader("Compliance")
 
     if is_all_valid:
-        st.success("Staircase fully complies with the standard!")
+        st.success("Fully complies with requirements!")
     else:
-        st.error("Standard requirements violations detected:")
+        st.error("Violations detected:")
         if not is_valid_angle:
-            st.warning(f"Inclination angle {angle:.1f}° outside allowed range (30°–38°).")
+            st.warning(f"Inclination angle {angle:.1f}° outside allowed range ({angle_min_ok}°–{angle_max_ok}°).")
         if not is_valid_blondel:
             st.warning(f"Blondel formula {blondel:.0f} mm outside allowed range (600–660 mm).")
         if not is_valid_g:
-            st.warning(f"Tread depth {g_actual:.1f} mm too small (min. 200 mm).")
+            st.warning(f"Tread depth {g_actual:.1f} mm too small (min. {g_min_ok} mm).")
+        if not is_valid_h:
+            st.warning(f"Riser height {h_actual:.1f} mm exceeds max allowed ({h_max_ok} mm).")
+        if not is_valid_w:
+            st.warning(f"Stair width {W} mm below minimum ({w_min_ok} mm).")
 
 with col_main:
     m_col1, m_col2, m_col3, m_col4 = st.columns(4)
@@ -175,10 +200,11 @@ with col_main:
     st.subheader("Side View Drawing")
     st.components.v1.html(svg_wrapper, height=svg_h + 20)
 
-    st.info(
-        f"**Blondel formula:** calculated value is **{blondel:.1f} mm** "
-        f"(ISO range: 600–660 mm)."
-    )
+    if blondel_applies:
+        st.info(
+            f"**Blondel formula:** calculated value is **{blondel:.1f} mm** "
+            f"(ISO range: 600–660 mm)."
+        )
 
 st.markdown("---")
 st.caption("Version: 1.0")
