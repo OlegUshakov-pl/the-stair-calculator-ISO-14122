@@ -1,5 +1,6 @@
-import streamlit as st
 import math
+
+import streamlit as st
 
 st.set_page_config(page_title="ISO 14122-3 Stair Calculator", layout="wide")
 
@@ -12,8 +13,7 @@ with col_sidebar:
     st.header("Input Parameters")
 
     stair_type = st.selectbox(
-        "Stair type per ISO 14122-3",
-        ["Stairs (20°–45°)", "Stepladders (45°–75°)"]
+        "Stair type per ISO 14122-3", ["Stairs (20°–45°)", "Stepladders (45°–75°)"]
     )
 
     if stair_type == "Stairs (20°–45°)":
@@ -32,17 +32,29 @@ with col_sidebar:
         blondel_applies = False
 
     input_mode = st.selectbox(
-        "Input mode",
-        ["Total rise height (H)", "Steps (N)", "Angle"]
+        "Input mode", ["Total rise height (H)", "Steps (N)", "Angle"]
     )
 
-    H = st.number_input("Total rise height (H), mm", min_value=300, max_value=4000, value=1500, step=50)
+    H = st.number_input(
+        "Total rise height (H), mm", min_value=300, max_value=4000, value=1500, step=50
+    )
 
     if input_mode == "Steps (N)":
-        N = st.number_input("Number of steps (N)", min_value=1, max_value=30, value=round(H / 180), step=1)
+        N = st.number_input(
+            "Number of steps (N)",
+            min_value=1,
+            max_value=30,
+            value=round(H / 180),
+            step=1,
+        )
         h_actual = H / N
     elif input_mode == "Angle":
-        angle_desired = st.slider("Desired angle (°)", angled_slider_min, angled_slider_max, (angled_slider_min + angled_slider_max) // 2)
+        angle_desired = st.slider(
+            "Desired angle (°)",
+            angled_slider_min,
+            angled_slider_max,
+            (angled_slider_min + angled_slider_max) // 2,
+        )
         angle_rad = math.radians(angle_desired)
         h_actual = 630 * math.tan(angle_rad) / (1 + 2 * math.tan(angle_rad))
         N = round(H / h_actual)
@@ -50,7 +62,9 @@ with col_sidebar:
             N = 1
         h_actual = H / N
     else:
-        h_target = st.slider("Desired riser height (h), mm", 140, h_max_ok, min(180, h_max_ok))
+        h_target = st.slider(
+            "Desired riser height (h), mm", 140, h_max_ok, min(180, h_max_ok)
+        )
         N = round(H / h_target)
         if N == 0:
             N = 1
@@ -75,7 +89,9 @@ with col_sidebar:
     is_valid_g = g_actual >= g_min_ok
     is_valid_w = W >= w_min_ok
 
-    is_all_valid = all([is_valid_blondel, is_valid_angle, is_valid_h, is_valid_g, is_valid_w])
+    is_all_valid = all(
+        [is_valid_blondel, is_valid_angle, is_valid_h, is_valid_g, is_valid_w]
+    )
 
     st.markdown("---")
     st.subheader("Compliance")
@@ -85,13 +101,19 @@ with col_sidebar:
     else:
         st.error("Violations detected:")
         if not is_valid_angle:
-            st.warning(f"Inclination angle {angle:.1f}° outside allowed range ({angle_min_ok}°–{angle_max_ok}°).")
+            st.warning(
+                f"Inclination angle {angle:.1f}° outside allowed range ({angle_min_ok}°–{angle_max_ok}°)."
+            )
         if not is_valid_blondel:
-            st.warning(f"Blondel formula {blondel:.0f} mm outside allowed range (600–660 mm).")
+            st.warning(
+                f"Blondel formula {blondel:.0f} mm outside allowed range (600–660 mm)."
+            )
         if not is_valid_g:
             st.warning(f"Tread depth {g_actual:.1f} mm too small (min. {g_min_ok} mm).")
         if not is_valid_h:
-            st.warning(f"Riser height {h_actual:.1f} mm exceeds max allowed ({h_max_ok} mm).")
+            st.warning(
+                f"Riser height {h_actual:.1f} mm exceeds max allowed ({h_max_ok} mm)."
+            )
         if not is_valid_w:
             st.warning(f"Stair width {W} mm below minimum ({w_min_ok} mm).")
 
@@ -100,8 +122,8 @@ with col_main:
     m_col1.metric("Steps (N)", f"{N}")
     m_col2.metric("Riser (h)", f"{h_actual:.1f} mm")
     m_col3.metric("Tread (g)", f"{g_actual:.1f} mm")
-    m_col4.metric("Angle", f"{angle:.1f}°")
-    m_col5.metric("L (h/sin)", f"{h_actual / math.sin(math.radians(angle)):.2f} mm")
+    m_col4.metric("Angle (a)", f"{angle:.1f}°")
+    m_col5.metric("L (h/sin(a))", f"{h_actual / math.sin(math.radians(angle)):.2f} mm")
 
     svg_w = 800
     svg_h = 500
