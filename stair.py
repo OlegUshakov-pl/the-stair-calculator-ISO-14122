@@ -96,11 +96,12 @@ with col_sidebar:
             st.warning(f"Stair width {W} mm below minimum ({w_min_ok} mm).")
 
 with col_main:
-    m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+    m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
     m_col1.metric("Steps (N)", f"{N}")
     m_col2.metric("Riser (h)", f"{h_actual:.1f} mm")
     m_col3.metric("Tread (g)", f"{g_actual:.1f} mm")
     m_col4.metric("Angle", f"{angle:.1f}°")
+    m_col5.metric("L (h/sin)", f"{h_actual / math.sin(math.radians(angle)):.2f} mm")
 
     svg_w = 800
     svg_h = 500
