@@ -199,7 +199,7 @@ with col_main:
     """
 
     st.subheader("Side View Drawing")
-    st.markdown(svg_wrapper, unsafe_allow_html=True)
+    st.components.v1.html(svg_wrapper, height=svg_h + 20)
 
     if blondel_applies:
         st.info(
