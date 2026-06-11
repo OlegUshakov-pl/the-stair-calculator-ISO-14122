@@ -4,7 +4,7 @@ import math
 st.set_page_config(page_title="ISO 14122-3 Stair Calculator", layout="wide")
 
 st.title("Industrial Stair Calculator")
-st.caption("Calculation and verification per ISO 14122-3 (Safety of machinery)")
+st.caption("Calculation and verification per ISO 14122-3 (Safety of machinery) — version 1.0")
 
 col_sidebar, col_main = st.columns([1, 2])
 
