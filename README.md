@@ -7,7 +7,7 @@ Streamlit-based calculation and verification tool for industrial stairs and step
 ## Features
 
 - **3 input modes:** total rise height (H), number of steps (N), or desired angle
-- **Automatic stair/stepladder detection** based on computed angle
+- **Automatic stair/stepladder detection** based on the computed inclination angle
 - **ISO 14122-3 compliance checks:** angle range, Blondel formula, tread depth, riser height, stair width
 - **Side-view SVG** with dimension labels (H, L, angle)
 - **Real-time feedback** — compliant in blue, violations in red
@@ -33,21 +33,19 @@ streamlit run stair.py
 
 ## How it works
 
-| Input | Stair | Stepladder |
-|---|---|---|
-| Angle range | 20° – 45° | 45° – 75° |
-| Tread (g) min | 200 mm | 150 mm |
-| Riser (h) max | 240 mm | 250 mm |
-| Width (W) min | 600 mm | 500 mm |
-| Blondel (g+2h) | 600–660 mm | — |
+| Type | Angle | Tread (g) min | Riser (h) max | Width (W) min | Blondel (g+2h) |
+|---|---|---|---|---|---|
+| Stairs | 20° – 45° | 200 mm | 240 mm | 600 mm | 600–660 mm |
+| Stepladders | 45° – 75° | 150 mm | 250 mm | 500 mm | — |
 
+The stair type is detected automatically from the computed angle.
 Tread is derived from the Blondel formula `g = 630 − 2h`, then the angle is computed as `atan(h/g)`.
 
 ## Stack
 
 - **Python 3** + **Streamlit**
 - Pure SVG rendering (no extra libs)
-- Single-file app: `stair.py` (231 lines)
+- Single-file app: `stair.py`
 
 ## Reference
 
