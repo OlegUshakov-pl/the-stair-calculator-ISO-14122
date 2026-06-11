@@ -11,15 +11,32 @@ col_sidebar, col_main = st.columns([1, 2])
 with col_sidebar:
     st.header("Input Parameters")
 
+    input_mode = st.selectbox(
+        "Input mode",
+        ["Total rise height (H)", "Steps (N)", "Angle"]
+    )
+
     H = st.number_input("Total rise height (H), mm", min_value=300, max_value=4000, value=1500, step=50)
-    h_target = st.slider("Desired riser height (h), mm", 140, 250, 180)
+
+    if input_mode == "Steps (N)":
+        N = st.number_input("Number of steps (N)", min_value=1, max_value=30, value=round(H / 180), step=1)
+        h_actual = H / N
+    elif input_mode == "Angle":
+        angle_desired = st.slider("Desired angle (°)", 30, 38, 33)
+        angle_rad = math.radians(angle_desired)
+        h_actual = 630 * math.tan(angle_rad) / (1 + 2 * math.tan(angle_rad))
+        N = round(H / h_actual)
+        if N == 0:
+            N = 1
+        h_actual = H / N
+    else:
+        h_target = st.slider("Desired riser height (h), mm", 140, 250, 180)
+        N = round(H / h_target)
+        if N == 0:
+            N = 1
+        h_actual = H / N
+
     W = st.slider("Stair width, mm", 600, 1200, 800)
-
-    N = round(H / h_target)
-    if N == 0:
-        N = 1
-
-    h_actual = H / N
 
     g_actual = 630 - (2 * h_actual)
 
