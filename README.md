@@ -1,3 +1,4 @@
+![The stair](image.png)
 # Industrial Stair Calculator
 
 Calculation and verification of industrial stairs per **ISO 14122-3** (Safety of machinery — Permanent means of access to machinery).
