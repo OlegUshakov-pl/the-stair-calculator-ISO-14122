@@ -12,31 +12,30 @@ col_sidebar, col_main = st.columns([1, 2])
 with col_sidebar:
     st.header("Input Parameters")
 
-
     stair_type = st.selectbox(
         "Stair type per ISO 14122-3", ["Stairs (20°–45°)", "Stepladders (45°–75°)"]
     )
 
     if stair_type == "Stairs (20°–45°)":
         angle_min_ok, angle_max_ok = 20, 45
-        angled_slider_min, angled_slider_max = 20, 45
+        angled_min, angled_max = 20, 45
         g_min_ok = 200
         h_max_ok = 240
         w_min_ok = 600
         blondel_applies = True
     else:
         angle_min_ok, angle_max_ok = 45, 75
-        angled_slider_min, angled_slider_max = 45, 75
+        angled_min, angled_max = 45, 75
         g_min_ok = 150
         h_max_ok = 250
         w_min_ok = 500
         blondel_applies = False
 
-=======
->>>>>>> e23cec8527d2b1d8f825a0ca2536934f081688a2
     input_mode = st.selectbox(
         "Input mode", ["Total rise height (H)", "Steps (N)", "Angle"]
     )
+
+    st.button("Recalc")
 
     H = st.number_input(
         "Total rise height (H), mm", min_value=300, max_value=4000, value=1500, step=50
@@ -53,12 +52,7 @@ with col_sidebar:
         h_actual = H / N
     elif input_mode == "Angle":
         angle_desired = st.slider(
-            "Desired angle (°)",
-<<<<<<< HEAD
-            angled_slider_min,
-            angled_slider_max,
-            (angled_slider_min + angled_slider_max) // 2,
-
+            "Desired angle (°)", angled_min, angled_max, (angled_min + angled_max) // 2
         )
         angle_rad = math.radians(angle_desired)
         h_actual = 630 * math.tan(angle_rad) / (1 + 2 * math.tan(angle_rad))
@@ -67,10 +61,12 @@ with col_sidebar:
             N = 1
         h_actual = H / N
     else:
-        h_target = st.slider(
-<<<<<<< HEAD
-            "Desired riser height (h), mm", 140, h_max_ok, min(180, h_max_ok)
-
+        h_target = st.number_input(
+            "Desired riser height (h), mm",
+            min_value=140,
+            max_value=h_max_ok,
+            value=min(180, h_max_ok),
+            step=1,
         )
         N = round(H / h_target)
         if N == 0:
@@ -87,19 +83,9 @@ with col_sidebar:
     angle = math.degrees(math.atan(h_actual / g_actual))
 
     if angle <= 45:
-        stair_type = "Stairs (20°–45°)"
-        angle_min_ok, angle_max_ok = 20, 45
-        g_min_ok = 200
-        h_max_ok = 240
-        w_min_ok = 600
-        blondel_applies = True
+        detected_type = "Stairs (20°–45°)"
     else:
-        stair_type = "Stepladders (45°–75°)"
-        angle_min_ok, angle_max_ok = 45, 75
-        g_min_ok = 150
-        h_max_ok = 250
-        w_min_ok = 500
-        blondel_applies = False
+        detected_type = "Stepladders (45°–75°)"
 
     L = g_actual * (N - 1)
 
@@ -118,7 +104,7 @@ with col_sidebar:
     st.markdown("---")
     st.subheader("Compliance")
 
-    st.info(f"Detected type: **{stair_type}**")
+    st.info(f"Selected: **{stair_type}** | Detected: **{detected_type}**")
 
     if is_all_valid:
         st.success("Fully complies with requirements!")
