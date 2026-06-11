@@ -1,4 +1,4 @@
-![The stair](image.png)
+
 
 # Industrial Stair Calculator
 
