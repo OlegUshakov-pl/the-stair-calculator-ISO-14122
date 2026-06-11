@@ -1,41 +1,38 @@
 ![The stair](image.png)
+
 # Industrial Stair Calculator
 
-Calculation and verification of industrial stairs per **ISO 14122-3** (Safety of machinery — Permanent means of access to machinery).
+Streamlit-based calculation and verification tool for industrial stairs per **ISO 14122-3:2016** — *Safety of machinery — Permanent means of access to machinery — Part 3: Stairs, stepladders and guard-rails*.
 
 ## Features
 
-- Calculate stair parameters from: total rise height (H), number of steps (N), or inclination angle
-- Automatic ISO 14122-3 compliance checks:
-  - Stairs inclination angle: 20°–45°
-  - Stepladders inclination angle: 45°–75°
-  - Blondel formula: 600–660 mm
+- **Three input modes:** Total rise height (H), number of steps (N), or desired inclination angle
+- **Automatic stair type detection** — Stairs (20°–45°) or Stepladders (45°–75°) based on the resulting angle
+- **ISO 14122-3 compliance checks:**
+  - Inclination angle within allowed range
+  - Blondel formula (g + 2h) within 600–660 mm for stairs
   - Minimum tread depth: 200 mm (stairs) / 150 mm (stepladders)
   - Maximum riser height: 240 mm (stairs) / 250 mm (stepladders)
   - Minimum stair width: 600 mm (stairs) / 500 mm (stepladders)
-- Side-view SVG visualization
-- Non-compliant parameters highlighted in red
+- **SVG side-view drawing** with dimension labels (H, L, angle)
+- **Metrics panel:** Steps (N), Riser (h), Tread (g), Angle (a), Slant length L = h/sin(a)
+- Visual feedback — compliant parameters in blue, violations in red
 
-## Installation
+## Quick Start (Windows)
 
-### 1. Clone the repository
+```bash
+install.bat   # creates venv and installs dependencies
+start.bat     # launches the app
+```
+
+## Manual Installation
 
 ```bash
 git clone <repo-url>
-cd streamlit
-```
-
-### 2. Create a virtual environment (recommended)
-
-```bash
+cd the-stair-calculator-ISO-14122
 python -m venv venv
-source venv/bin/activate      # Linux / macOS
-venv\Scripts\activate          # Windows
-```
-
-### 3. Install dependencies
-
-```bash
+venv\Scripts\activate     # Windows
+source venv/bin/activate  # Linux / macOS
 pip install -r requirements.txt
 ```
 
@@ -45,13 +42,12 @@ pip install -r requirements.txt
 streamlit run stair.py
 ```
 
-The app will open in your browser.
+1. Select input mode: **Total rise height (H)**, **Steps (N)**, or **Angle**
+2. Adjust sliders/inputs in the left panel
+3. The stair type is detected automatically from the computed angle
+4. View metrics and SVG drawing on the right
+5. Compliance status shows any violations in real time
 
-1. Choose input mode: total height, number of steps, or angle
-2. Adjust parameters with the sliders
-3. The stair diagram and metrics are displayed on the right
-4. Compliance status is shown in the left panel
-
-## Standard
+## Standard Reference
 
 **ISO 14122-3:2016** — Safety of machinery — Permanent means of access to machinery — Part 3: Stairs, stepladders and guard-rails.
