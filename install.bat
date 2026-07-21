@@ -1,6 +1,13 @@
 @echo off
+where py >nul 2>nul
+if %errorlevel% equ 0 (
+    set "PYTHON_CMD=py -3.14"
+) else (
+    set "PYTHON_CMD=python"
+)
+
 echo Creating virtual environment...
-python -m venv venv
+%PYTHON_CMD% -m venv venv
 if %errorlevel% neq 0 (
     echo Failed to create virtual environment. Make sure Python is installed.
     pause
