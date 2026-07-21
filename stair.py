@@ -231,4 +231,4 @@ with col_main:
         )
 
 st.markdown("---")
-st.caption("Version: 1.2")
+st.caption("Version: 1.4")
