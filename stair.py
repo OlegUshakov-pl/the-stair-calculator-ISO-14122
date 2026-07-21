@@ -70,16 +70,19 @@ with col_sidebar:
         angle = math.degrees(math.atan(h_actual / g_actual))
 
     st.markdown("---")
-    st.session_state["__dn"] = N
-    st.number_input("Steps (N)", value=N, disabled=True, key="__dn")
+    if edit_param != "Steps (N)":
+        st.session_state["__dn"] = N
+        st.number_input("Steps (N)", value=N, disabled=True, key="__dn")
+    if edit_param != "L (horizontal)":
+        st.session_state["__dl"] = round(L, 0)
+        st.number_input("L (horizontal), mm", value=round(L, 0), disabled=True, format="%.0f", key="__dl")
+    if edit_param != "Desired angle (°)":
+        st.session_state["__da"] = round(angle, 1)
+        st.number_input("Desired angle (°)", value=round(angle, 1), disabled=True, format="%.1f", key="__da")
     st.session_state["__dh"] = round(h_actual, 1)
     st.number_input("Riser (h), mm", value=round(h_actual, 1), disabled=True, format="%.1f", key="__dh")
     st.session_state["__dg"] = round(g_actual, 1)
     st.number_input("Tread (g), mm", value=round(g_actual, 1), disabled=True, format="%.1f", key="__dg")
-    st.session_state["__dl"] = round(L, 0)
-    st.number_input("L (horizontal), mm", value=round(L, 0), disabled=True, format="%.0f", key="__dl")
-    st.session_state["__da"] = round(angle, 1)
-    st.number_input("Desired angle (°)", value=round(angle, 1), disabled=True, format="%.1f", key="__da")
 
     W = st.slider("Stair width, mm", 400, 1200, 600)
 
