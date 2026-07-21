@@ -7,11 +7,14 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo Activating virtual environment...
-call venv\Scripts\activate.bat
+if exist "venv\Scripts\python.exe" (
+    set "VENV_PYTHON=venv\Scripts\python.exe"
+) else (
+    set "VENV_PYTHON=venv\bin\python.exe"
+)
 
 echo Installing dependencies...
-pip install -r requirements.txt
+%VENV_PYTHON% -m pip install -r requirements.txt
 if %errorlevel% neq 0 (
     echo Failed to install dependencies.
     pause
