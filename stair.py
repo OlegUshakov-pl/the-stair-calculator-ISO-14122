@@ -13,20 +13,21 @@ with col_sidebar:
     st.header("Input Parameters")
 
     H = st.number_input(
-        "Total rise height (H), mm", min_value=300, max_value=4000, value=1500, step=50
+        "Total rise height (H), mm", min_value=300, max_value=4000, value=1500, step=50,
+        key="_h",
     )
 
     if "_src" not in st.session_state:
-        st.session_state._src = "g"
-    if "_g" not in st.session_state:
-        st.session_state._g = 280.0
+        st.session_state._src = "n"
+    if "_n" not in st.session_state:
+        st.session_state._n = 8
     if "_l" not in st.session_state:
         st.session_state._l = 1000.0
     if "_a" not in st.session_state:
         st.session_state._a = 33.0
 
-    def _set_g():
-        st.session_state._src = "g"
+    def _set_n():
+        st.session_state._src = "n"
 
     def _set_l():
         st.session_state._src = "l"
@@ -36,46 +37,60 @@ with col_sidebar:
 
     _src = st.session_state._src
 
-    if _src == "g":
-        g_actual = st.number_input(
-            "Tread (g), mm", min_value=150.0, max_value=400.0, step=1.0,
-            format="%.1f", key="_g", on_change=_set_g,
+    if _src == "n":
+        N = st.number_input(
+            "Steps (N)", min_value=1, max_value=30, step=1,
+            key="_n", on_change=_set_n,
         )
+        h_actual = H / N
+        g_actual = 630 - 2 * h_actual
+        if g_actual < 50:
+            g_actual = 50
+            h_actual = (630 - g_actual) / 2
+            N = max(1, round(H / h_actual))
+            h_actual = H / N
+            g_actual = 630 - 2 * h_actual
+        L = g_actual * (N - 1)
+        angle = math.degrees(math.atan(h_actual / g_actual))
     elif _src == "l":
         L = st.number_input(
             "L (horizontal), mm", min_value=100.0, max_value=5000.0, step=50.0,
             format="%.0f", key="_l", on_change=_set_l,
         )
-        angle_in = st.session_state._a
-        a_rad = math.radians(angle_in)
-        g_actual = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
+        angle_val = st.session_state._a
+        a_rad = math.radians(angle_val)
+        g_approx = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
+        N = max(1, round(L / g_approx + 1))
+        h_actual = H / N
+        g_actual = 630 - 2 * h_actual
+        if g_actual < 50:
+            g_actual = 50
+        L = g_actual * (N - 1)
+        angle = math.degrees(math.atan(h_actual / g_actual))
     else:
         angle_in = st.number_input(
             "Desired angle (°)", min_value=20.0, max_value=75.0, step=0.5,
             format="%.1f", key="_a", on_change=_set_angle,
         )
         a_rad = math.radians(angle_in)
-        g_actual = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
-
-    h_actual_val = (630 - g_actual) / 2
-    N = max(1, round(H / h_actual_val))
-    h_actual = H / N
-    g_actual = 630 - 2 * h_actual
-    if g_actual < 50:
-        g_actual = 50
-    L = g_actual * (N - 1)
-
-    angle = math.degrees(math.atan(h_actual / g_actual))
+        g_approx = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
+        N = max(1, round(H / ((630 - g_approx) / 2)))
+        h_actual = H / N
+        g_actual = 630 - 2 * h_actual
+        if g_actual < 50:
+            g_actual = 50
+        L = g_actual * (N - 1)
+        angle = math.degrees(math.atan(h_actual / g_actual))
 
     st.markdown("---")
-    if _src != "g":
-        st.number_input("Tread (g), mm", value=round(g_actual, 1), disabled=True, format="%.1f")
+    if _src != "n":
+        st.number_input("Steps (N)", value=N, disabled=True, key="_n_d")
     if _src != "l":
-        st.number_input("L (horizontal), mm", value=round(L, 0), disabled=True, format="%.0f")
+        st.number_input("L (horizontal), mm", value=round(L, 0), disabled=True, format="%.0f", key="_l_d")
     if _src != "angle":
-        st.number_input("Desired angle (°)", value=round(angle, 1), disabled=True, format="%.1f")
-    st.number_input("Steps (N)", value=N, disabled=True)
-    st.number_input("Riser (h), mm", value=round(h_actual, 1), disabled=True, format="%.1f")
+        st.number_input("Desired angle (°)", value=round(angle, 1), disabled=True, format="%.1f", key="_a_d")
+    st.number_input("Riser (h), mm", value=round(h_actual, 1), disabled=True, format="%.1f", key="_rh_d")
+    st.number_input("Tread (g), mm", value=round(g_actual, 1), disabled=True, format="%.1f", key="_g_d")
 
     W = st.slider("Stair width, mm", 400, 1200, 600)
 
@@ -249,4 +264,4 @@ with col_main:
         )
 
 st.markdown("---")
-st.caption("Version: 1.5")
+st.caption("Version: 1.6")
