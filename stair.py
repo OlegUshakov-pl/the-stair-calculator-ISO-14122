@@ -17,65 +17,65 @@ with col_sidebar:
     )
 
     if "_src" not in st.session_state:
-        st.session_state._src = "n"
-    if "_n" not in st.session_state:
-        st.session_state._n = max(1, round(H / 180))
+        st.session_state._src = "g"
+    if "_g" not in st.session_state:
+        st.session_state._g = 280.0
+    if "_l" not in st.session_state:
+        st.session_state._l = 1000.0
+    if "_a" not in st.session_state:
+        st.session_state._a = 33.0
 
-    def _set_n():
-        st.session_state._src = "n"
+    def _set_g():
+        st.session_state._src = "g"
 
-    def _set_h():
-        st.session_state._src = "h"
+    def _set_l():
+        st.session_state._src = "l"
 
     def _set_angle():
         st.session_state._src = "angle"
 
     _src = st.session_state._src
 
-    if _src == "n":
-        N = st.number_input(
-            "Steps (N)", min_value=1, max_value=30, step=1,
-            key="_n", on_change=_set_n,
+    if _src == "g":
+        g_actual = st.number_input(
+            "Tread (g), mm", min_value=150.0, max_value=400.0, step=1.0,
+            format="%.1f", key="_g", on_change=_set_g,
         )
-        h_actual = H / N
-    elif _src == "h":
-        h_actual = st.number_input(
-            "Desired riser height (h), mm",
-            min_value=140.0, max_value=250.0, step=1.0,
-            format="%.1f", key="_h", on_change=_set_h,
+    elif _src == "l":
+        L = st.number_input(
+            "L (horizontal), mm", min_value=100.0, max_value=5000.0, step=50.0,
+            format="%.0f", key="_l", on_change=_set_l,
         )
-        N = max(1, round(H / h_actual))
-        h_actual = H / N
+        angle_in = st.session_state._a
+        a_rad = math.radians(angle_in)
+        g_actual = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
     else:
         angle_in = st.number_input(
             "Desired angle (°)", min_value=20.0, max_value=75.0, step=0.5,
             format="%.1f", key="_a", on_change=_set_angle,
         )
         a_rad = math.radians(angle_in)
-        h_calc = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
-        N = max(1, round(H / h_calc))
-        h_actual = H / N
+        g_actual = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
 
+    h_actual_val = (630 - g_actual) / 2
+    N = max(1, round(H / h_actual_val))
+    h_actual = H / N
     g_actual = 630 - 2 * h_actual
     if g_actual < 50:
         g_actual = 50
+    L = g_actual * (N - 1)
+
     angle = math.degrees(math.atan(h_actual / g_actual))
 
     st.markdown("---")
-    if _src != "h":
-        st.number_input(
-            "Desired riser height (h), mm", value=round(h_actual, 1),
-            disabled=True, format="%.1f",
-        )
-    if _src != "n":
-        st.number_input(
-            "Steps (N)", value=N, disabled=True,
-        )
+    if _src != "g":
+        st.number_input("Tread (g), mm", value=round(g_actual, 1), disabled=True, format="%.1f")
+    if _src != "l":
+        st.number_input("L (horizontal), mm", value=round(L, 0), disabled=True, format="%.0f")
     if _src != "angle":
-        st.number_input(
-            "Desired angle (°)", value=round(angle, 1),
-            disabled=True, format="%.1f",
-        )
+        st.number_input("Desired angle (°)", value=round(angle, 1), disabled=True, format="%.1f")
+    st.number_input("Steps (N)", value=N, disabled=True)
+    st.number_input("Riser (h), mm", value=round(h_actual, 1), disabled=True, format="%.1f")
 
     W = st.slider("Stair width, mm", 400, 1200, 600)
 
@@ -93,8 +93,6 @@ with col_sidebar:
         h_max_ok = 250
         w_min_ok = 500
         blondel_applies = False
-
-    L = g_actual * (N - 1)
 
     blondel = g_actual + 2 * h_actual
 
