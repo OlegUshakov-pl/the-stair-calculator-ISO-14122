@@ -23,11 +23,11 @@ with col_sidebar:
     )
 
     if "_n" not in st.session_state:
-        st.session_state._n = 8
+        st.session_state["_n"] = 8
     if "_l" not in st.session_state:
-        st.session_state._l = 1000.0
+        st.session_state["_l"] = 1000.0
     if "_a" not in st.session_state:
-        st.session_state._a = 33.0
+        st.session_state["_a"] = 33.0
 
     if edit_param == "Steps (N)":
         N = st.number_input(
@@ -44,10 +44,19 @@ with col_sidebar:
             "L (horizontal), mm", min_value=100.0, max_value=5000.0, step=50.0,
             format="%.0f", key="_l",
         )
-        angle_val = st.session_state._a
-        a_rad = math.radians(angle_val)
-        g_approx = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
-        N = max(1, round(L / g_approx + 1))
+        best_n = 1
+        best_diff = float("inf")
+        for n_test in range(1, 31):
+            h_test = H / n_test
+            g_test = 630 - 2 * h_test
+            if g_test < 50:
+                g_test = 50
+            l_test = g_test * (n_test - 1)
+            diff = abs(l_test - L)
+            if diff < best_diff:
+                best_diff = diff
+                best_n = n_test
+        N = best_n
         h_actual = H / N
         g_actual = 630 - 2 * h_actual
         if g_actual < 50:
@@ -60,7 +69,7 @@ with col_sidebar:
             format="%.1f", key="_a",
         )
         a_rad = math.radians(angle_in)
-        g_approx = 630 * math.tan(a_rad) / (1 + 2 * math.tan(a_rad))
+        g_approx = 630 / (1 + 2 * math.tan(a_rad))
         N = max(1, round(H / ((630 - g_approx) / 2)))
         h_actual = H / N
         g_actual = 630 - 2 * h_actual
@@ -86,7 +95,7 @@ with col_sidebar:
 
     W = st.slider("Stair width, mm", 400, 1200, 600)
 
-    if angle <= 45:
+    if angle < 45:
         stair_type = "Stairs (20°–45°)"
         angle_min_ok, angle_max_ok = 20, 45
         g_min_ok = 200
