@@ -6,11 +6,12 @@ Streamlit-based calculation and verification tool for industrial stairs and step
 
 ## Features
 
-- **3 input modes:** total rise height (H), number of steps (N), or desired angle
-- **Automatic stair/stepladder detection** based on the computed inclination angle
+- **3 input modes:** Steps (N), horizontal run (L), or desired angle
+- **Step offsets:** Pd (bottom) and Pup (top) — distances from floor to first/last step
+- **Automatic stair/stepladder detection** based on inclination angle
 - **ISO 14122-3 compliance checks:** angle range, Blondel formula, tread depth, riser height, stair width
-- **Side-view SVG** with dimension labels (H, L, angle)
-- **Real-time feedback** — compliant in blue, violations in red
+- **Side-view SVG** with all dimensions (H, L, angle, Pd, Pup) and orange offset markers
+- **Real-time feedback** — compliant steps in blue, violations in red
 
 ## Quick Start (Windows)
 
@@ -40,6 +41,26 @@ streamlit run stair.py
 
 The stair type is detected automatically from the computed angle.
 Tread is derived from the Blondel formula `g = 630 − 2h`, then the angle is computed as `atan(h/g)`.
+
+### Step offsets (Pd, Pup)
+
+- **Pd** — vertical distance from lower floor to the first step
+- **Pup** — vertical distance from the last step to the upper floor
+- Effective rise height for the steps: `H_net = H − Pd − Pup`
+- Each step height: `h = H_net / N`
+- Horizontal offset: `x_off = (Pd + Pup) / tan(a)`
+- Total run: `L = (N−1)·g + x_off`
+- The solver iterates (15 iterations) to converge on the correct angle with offsets
+
+## Input modes
+
+| Mode | You set | Calculated |
+|---|---|---|
+| Steps (N) | H, N, Pd, Pup | h, g, L, angle |
+| L (horizontal) | H, L, Pd, Pup | N, h, g, angle |
+| Desired angle (°) | H, angle, Pd, Pup | N, h, g, L |
+
+Each mode has a slider + manual number input (synchronised).
 
 ## Stack
 
