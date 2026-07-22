@@ -22,16 +22,9 @@ with col_sidebar:
         horizontal=True,
     )
 
-    if "_n" not in st.session_state:
-        st.session_state["_n"] = 8
-    if "_l" not in st.session_state:
-        st.session_state["_l"] = 1000.0
-    if "_a" not in st.session_state:
-        st.session_state["_a"] = 33.0
-
     if edit_param == "Steps (N)":
         N = st.number_input(
-            "Steps (N)", min_value=1, max_value=30, step=1, key="_n",
+            "Steps (N)", min_value=1, max_value=30, step=1, value=8, key="inp_n",
         )
         h_actual = H / N
         g_actual = 630 - 2 * h_actual
@@ -41,8 +34,8 @@ with col_sidebar:
         angle = math.degrees(math.atan(h_actual / g_actual))
     elif edit_param == "L (horizontal)":
         L = st.number_input(
-            "L (horizontal), mm", min_value=100.0, max_value=5000.0, step=50.0,
-            format="%.0f", key="_l",
+            "L (horizontal), mm", min_value=100.0, max_value=5000.0, step=1.0,
+            format="%.0f", value=1000.0, key="inp_l",
         )
         best_n = 1
         best_diff = float("inf")
@@ -65,8 +58,8 @@ with col_sidebar:
         angle = math.degrees(math.atan(h_actual / g_actual))
     else:
         angle_in = st.number_input(
-            "Desired angle (°)", min_value=20.0, max_value=75.0, step=0.5,
-            format="%.1f", key="_a",
+            "Desired angle (°)", min_value=20.0, max_value=75.0, step=0.1,
+            format="%.1f", value=33.0, key="inp_a",
         )
         a_rad = math.radians(angle_in)
         g_approx = 630 / (1 + 2 * math.tan(a_rad))
@@ -80,17 +73,12 @@ with col_sidebar:
 
     st.markdown("---")
     if edit_param != "Steps (N)":
-        st.session_state["__dn"] = N
         st.number_input("Steps (N)", value=N, disabled=True, key="__dn")
     if edit_param != "L (horizontal)":
-        st.session_state["__dl"] = round(L, 0)
         st.number_input("L (horizontal), mm", value=round(L, 0), disabled=True, format="%.0f", key="__dl")
     if edit_param != "Desired angle (°)":
-        st.session_state["__da"] = round(angle, 1)
         st.number_input("Desired angle (°)", value=round(angle, 1), disabled=True, format="%.1f", key="__da")
-    st.session_state["__dh"] = round(h_actual, 1)
     st.number_input("Riser (h), mm", value=round(h_actual, 1), disabled=True, format="%.1f", key="__dh")
-    st.session_state["__dg"] = round(g_actual, 1)
     st.number_input("Tread (g), mm", value=round(g_actual, 1), disabled=True, format="%.1f", key="__dg")
 
     W = st.slider("Stair width, mm", 400, 1200, 600)
