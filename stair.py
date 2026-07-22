@@ -33,7 +33,7 @@ with col_sidebar:
         L = g_actual * (N - 1)
         angle = math.degrees(math.atan(h_actual / g_actual))
     elif edit_param == "L (horizontal)":
-        L = st.number_input(
+        L_desired = st.number_input(
             "L (horizontal), mm", min_value=100.0, max_value=5000.0, step=1.0,
             format="%.0f", value=1000.0, key="inp_l",
         )
@@ -45,7 +45,7 @@ with col_sidebar:
             if g_test < 50:
                 g_test = 50
             l_test = g_test * (n_test - 1)
-            diff = abs(l_test - L)
+            diff = abs(l_test - L_desired)
             if diff < best_diff:
                 best_diff = diff
                 best_n = n_test
@@ -54,14 +54,15 @@ with col_sidebar:
         g_actual = 630 - 2 * h_actual
         if g_actual < 50:
             g_actual = 50
-        L = g_actual * (N - 1)
+        L_actual = g_actual * (N - 1)
         angle = math.degrees(math.atan(h_actual / g_actual))
+        L = L_actual
     else:
-        angle_in = st.number_input(
+        angle_desired = st.number_input(
             "Desired angle (°)", min_value=20.0, max_value=75.0, step=0.1,
             format="%.1f", value=33.0, key="inp_a",
         )
-        a_rad = math.radians(angle_in)
+        a_rad = math.radians(angle_desired)
         g_approx = 630 / (1 + 2 * math.tan(a_rad))
         N = max(1, round(H / ((630 - g_approx) / 2)))
         h_actual = H / N
@@ -69,7 +70,8 @@ with col_sidebar:
         if g_actual < 50:
             g_actual = 50
         L = g_actual * (N - 1)
-        angle = math.degrees(math.atan(h_actual / g_actual))
+        angle_actual = math.degrees(math.atan(h_actual / g_actual))
+        angle = angle_actual
 
     st.markdown("---")
     if edit_param != "Steps (N)":
@@ -80,6 +82,13 @@ with col_sidebar:
         st.number_input("Desired angle (°)", value=round(angle, 1), disabled=True, format="%.1f", key="__da")
     st.number_input("Riser (h), mm", value=round(h_actual, 1), disabled=True, format="%.1f", key="__dh")
     st.number_input("Tread (g), mm", value=round(g_actual, 1), disabled=True, format="%.1f", key="__dg")
+
+    if edit_param == "L (horizontal)":
+        l_dev = L_desired - L
+        st.caption(f"Desired L: {L_desired:.0f} mm | Actual L: {L:.0f} mm | Δ = {l_dev:+.0f} mm")
+    elif edit_param == "Desired angle (°)":
+        a_dev = angle_desired - angle
+        st.caption(f"Desired angle: {angle_desired:.1f}° | Actual angle: {angle:.1f}° | Δ = {a_dev:+.1f}°")
 
     W = st.slider("Stair width, mm", 400, 1200, 600)
 
